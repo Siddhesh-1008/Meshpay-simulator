@@ -65,7 +65,7 @@ This project simulates an architecture where encrypted payment packets can conti
 The following diagram illustrates the complete lifecycle of an offline payment packet—from transaction creation to secure settlement.
 
 <p align="center">
-  <img src="./docs/upi_mesh_architecture_v2.png" alt="MeshPay Architecture" width="700"/>
+ <img src="./upi_mesh_architecture_v2.png" alt="MeshPay Architecture" width="850"/>
 </p>
 
 ### Flow Overview
