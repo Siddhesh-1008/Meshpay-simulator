@@ -62,27 +62,52 @@ This project simulates an architecture where encrypted payment packets can conti
 
 # Project Flow
 
-```text
-Create Transaction Packet
-        ↓
-Encrypt Packet
-        ↓
-Inject Into Mesh
-        ↓
-Gossip-Based Packet Forwarding
-        ↓
-Bridge Node Gets Internet
-        ↓
-Upload To Backend
-        ↓
-Decrypt + Validate
-        ↓
-Prevent Duplicate Settlement
-        ↓
-Update Account Balances
-```
+The following diagram illustrates the complete lifecycle of an offline payment packet—from transaction creation to secure settlement.
 
----
+<p align="center">
+  <img src="./docs/upi_mesh_architecture_v2.png" alt="MeshPay Architecture" width="700"/>
+</p>
+
+### Flow Overview
+
+1. **Compose Payment**
+   - User selects sender, receiver, amount, and PIN.
+   - A payment instruction is created.
+
+2. **Hybrid Encryption**
+   - AES-256-GCM encrypts the payment payload.
+   - RSA-OAEP encrypts the AES session key.
+
+3. **Mesh Packet Injection**
+   - The encrypted payload is wrapped inside a mesh packet.
+   - A Time-To-Live (TTL) value is assigned.
+
+4. **Gossip Propagation**
+   - Nearby virtual devices forward the encrypted packet.
+   - Packets continue propagating until TTL expires or a bridge node receives them.
+
+5. **Bridge Device**
+   - When a bridge node regains internet connectivity, it uploads the packet to the backend.
+
+6. **Idempotency Check**
+   - The backend computes a SHA-256 hash of the ciphertext.
+   - Duplicate packets are rejected using an atomic `putIfAbsent()` operation.
+
+7. **Decrypt & Verify**
+   - The backend decrypts the packet.
+   - Freshness, integrity, and replay protection are verified.
+
+8. **Settlement**
+   - The sender is debited.
+   - The receiver is credited.
+   - A transaction record is inserted into the ledger.
+
+9. **Transaction Ledger**
+   - Every successful transaction is permanently recorded.
+   - The mesh layer receives no settlement feedback in this simulation.
+
+10. **Dashboard**
+    - The dashboard visualizes balances, mesh devices, transactions, and activity logs in real time.
 
 # Mesh Simulation
 
